@@ -1,7 +1,7 @@
 import pygame
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self,x,y, item_type, animation_list):
+    def __init__(self,x,y, item_type, animation_list, dummy_coin = False):
         pygame.sprite.Sprite.__init__(self)
         # 0-> coins , 1-> portion
         self.item_type = item_type
@@ -11,8 +11,14 @@ class Item(pygame.sprite.Sprite):
         self.image = self.animtion_list[self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
+        self.dummy_coin = dummy_coin
 
-    def update(self, player):
+    def update(self, screen_scroll, player):
+        # Doesn't apply to the dummy coin that is displayed at the top
+        if not self.dummy_coin:
+            # reposition based on screen scroll
+            self.rect.x += screen_scroll[0]
+            self.rect.y += screen_scroll[1]
         # check to see if item is collected
         if self.rect.colliderect(player.rect):
             # coins

@@ -1,11 +1,13 @@
 from typing import Any
 import pygame
+import csv
 import pygame.locals
 from pygame.sprite import Group 
 import Constants as cs
 from Character import Characters
 from Weapon import Weapons
 from Items import Item
+from World import Worlds
 
 pygame.init
 pygame.font.init()
@@ -13,7 +15,12 @@ pygame.font.init()
 Screen = pygame.display.set_mode((cs.Screen_Width,cs.Screen_Hight))
 pygame.display.set_caption(" Monster Killer !")
 
+# create clock for maintaning frame rate
 clock = pygame.time.Clock()
+
+# Define game variables
+level = 1
+screen_scroll = [0,0]
 
 # Player Movement
 moving_left = False
@@ -47,6 +54,13 @@ potion_image = scale_img(pygame.image.load(r"assets\images\items\potion_red.png"
 # Load weapon image
 kaman_image = scale_img(pygame.image.load(r"assets\images\weapons\bow.png").convert_alpha(),cs.Weapon_Scale)
 teer_image = scale_img(pygame.image.load(r"assets\images\weapons\arrow.png").convert_alpha(),cs.Weapon_Scale)
+
+# Load tile map images
+tile_list = []
+for x in range(cs.Tile_Types):
+    tile_image = pygame.image.load(f"assets/images/tiles/{x}.png").convert_alpha()
+    tile_image = pygame.transform.scale(tile_image, (cs.Tile_Size, cs.Tile_Size))
+    tile_list.append(tile_image)
 
 # load character images
 mob_animations = []
@@ -89,6 +103,22 @@ def draw_info ():
     # show Score
     draw_text(f"X{player.score}", font, cs.White, cs.Screen_Width - 100, 15)
 
+# create empty tile list
+world_data = [  ]
+for row in range(cs.Rows):
+    r = [-1] * cs.Columns
+    world_data.append(r)
+
+# Loading level data to create world
+with open(f"Levels/level{level}_data.csv",newline = "") as csvfile:
+    reader = csv.reader(csvfile, delimiter= ",")
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
+
+
+world = Worlds()
+world.process_data(world_data, tile_list)
 
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -100,7 +130,9 @@ class DamageText(pygame.sprite.Sprite):
         self.counter = 0
 
     def update(self):
-        
+        # reposition based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1] 
         # damage text moving up
         self.rect.y -= 1
         # delete the char after few sec
@@ -110,10 +142,10 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # create player
-player = Characters(100,100, 70,mob_animations,0)
+player = Characters(400,300, 70,mob_animations,0)
 
 # create enemy
-enemy =Characters(200,300,100, mob_animations,1)
+enemy =Characters(300,300,100, mob_animations,1)
 
 # create players weapon
 kaman = Weapons(kaman_image, teer_image)
@@ -127,7 +159,7 @@ damage_text_group = pygame.sprite.Group()
 teer_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
-score_coin = Item(cs.Screen_Width-115, 23, 0, coin_images)
+score_coin = Item(cs.Screen_Width-115, 23, 0, coin_images, True)
 item_group.add(score_coin)
 
 potion = Item(200, 200, 1, [potion_image])
@@ -154,11 +186,15 @@ while run:
         dy = cs.Down_Speed
     if moving_down == True:
         dy = cs.Speed
-    # Move of player at dx,dy  
-    player.move(dx,dy)
 
-    # Update player 
+    # Move of player at dx,dy  
+    screen_scroll = player.move(dx,dy)
+
+    # Update all objects 
+    world.update(screen_scroll)
+
     for enemy in enemy_list:
+        enemy.ai(screen_scroll)
         enemy.update()
     player.update()
     
@@ -166,15 +202,16 @@ while run:
     if teer:
         teer_group.add(teer)
     for teer in teer_group:
-        damage, damage_pos = teer.update(enemy_list)
+        damage, damage_pos = teer.update(screen_scroll,enemy_list)
         if damage:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), cs.Red)
             damage_text_group.add(damage_text)
     damage_text_group.update()
-    item_group.update(player)
+    item_group.update(screen_scroll, player)
     
 
     # Draw the player on screen
+    world.draw(Screen)
     for enemy in enemy_list:
         enemy.draw(Screen)
     player.draw(Screen)

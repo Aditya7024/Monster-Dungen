@@ -16,10 +16,11 @@ class Characters():
         self.alive = True
 
         self.image = self.animation_list[self.action][self.frame_index]
-        self.rect = pygame.Rect(0,0,40,40)
+        self.rect = pygame.Rect(0,0, cs.Tile_Size, cs.Tile_Size)
         self.rect.center = (x,y)
     
     def move(self,dx,dy):
+        screen_scroll = [0,0]
         self.running = False
         if dx != 0 or dy != 0:
             self.running = True
@@ -32,6 +33,32 @@ class Characters():
             dy = dy * (math.sqrt(2)/2)
         self.rect.x += dx
         self.rect.y += dy
+
+        # only move screen for player not enimies movements
+        if self.char_type == 0:
+
+            # move camera left or right
+            if self.rect.right > (cs.Screen_Width - cs.Scroll_Thresh):
+                screen_scroll[0] = (cs.Screen_Width - cs.Scroll_Thresh) - self.rect.right
+                self.rect.right = cs.Screen_Width - cs.Scroll_Thresh
+            if self.rect.left < cs.Scroll_Thresh:
+                screen_scroll[0] = cs.Scroll_Thresh - self.rect.left
+                self.rect.left = cs.Scroll_Thresh
+
+            # move camera up or down
+            if self.rect.bottom > (cs.Screen_Hight - cs.Scroll_Thresh):
+                screen_scroll[1] = (cs.Screen_Hight - cs.Scroll_Thresh) - self.rect.bottom
+                self.rect.bottom = cs.Screen_Hight - cs.Scroll_Thresh
+            if self.rect.top < cs.Scroll_Thresh:
+                screen_scroll[1] = cs.Scroll_Thresh - self.rect.top
+                self.rect.top = cs.Scroll_Thresh
+
+        return screen_scroll
+
+    def ai(self, screen_scroll):
+        # reposition the mobs based on screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
 
     def update(self):
         # check if character is dead

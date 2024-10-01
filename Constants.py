@@ -9,6 +9,11 @@ Speed = 5
 Down_Speed = -5
 Teer_speed = 10
 Offset = 12
+Tile_Size =16 * Scale
+Tile_Types = 18
+Rows = 150
+Columns = 150
+Scroll_Thresh = 200
 
 # Colors
 Red = (255,0,0)
