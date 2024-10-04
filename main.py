@@ -19,7 +19,7 @@ pygame.display.set_caption(" Monster Killer !")
 clock = pygame.time.Clock()
 
 # Define game variables
-level = 1
+level = 3
 screen_scroll = [0,0]
 
 # Player Movement
@@ -50,6 +50,10 @@ for i in range(4):
 
 # Load potion image
 potion_image = scale_img(pygame.image.load(r"assets\images\items\potion_red.png").convert_alpha(),cs.Potion_Scale)
+
+item_images = []
+item_images.append(coin_images)
+item_images.append(potion_image)
 
 # Load weapon image
 kaman_image = scale_img(pygame.image.load(r"assets\images\weapons\bow.png").convert_alpha(),cs.Weapon_Scale)
@@ -99,7 +103,10 @@ def draw_info ():
             half_heart_draw = True
         else:
             Screen.blit(heart_empty,(10 + i * 50, 0))
-        
+
+    # level
+    draw_text("Level: " + str(level), font, cs.White, cs.Screen_Width / 2, 15)
+
     # show Score
     draw_text(f"X{player.score}", font, cs.White, cs.Screen_Width - 100, 15)
 
@@ -118,7 +125,7 @@ with open(f"Levels/level{level}_data.csv",newline = "") as csvfile:
 
 
 world = Worlds()
-world.process_data(world_data, tile_list)
+world.process_data(world_data, tile_list, item_images, mob_animations)
 
 # Damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -142,17 +149,14 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # create player
-player = Characters(400,300, 70,mob_animations,0)
-
-# create enemy
-enemy =Characters(300,300,100, mob_animations,1)
+player = world.player
 
 # create players weapon
 kaman = Weapons(kaman_image, teer_image)
 
-# empty enemy list
-enemy_list = []
-enemy_list.append(enemy)
+# Extract enemies from world data
+enemy_list = world.enemies
+
 
 # Create sprite group
 damage_text_group = pygame.sprite.Group()
@@ -161,12 +165,9 @@ item_group = pygame.sprite.Group()
 
 score_coin = Item(cs.Screen_Width-115, 23, 0, coin_images, True)
 item_group.add(score_coin)
-
-potion = Item(200, 200, 1, [potion_image])
-item_group.add(potion)
-coin = Item(400, 400, 0, coin_images )
-item_group.add(coin)
-
+# Add the items from the level data
+for item in world.item_list:
+    item_group.add(item)
 
 # main game loop
 run = True
@@ -188,21 +189,22 @@ while run:
         dy = cs.Speed
 
     # Move of player at dx,dy  
-    screen_scroll = player.move(dx,dy)
+    screen_scroll = player.move(dx,dy, world.obstacle_tile)
 
     # Update all objects 
     world.update(screen_scroll)
 
     for enemy in enemy_list:
-        enemy.ai(screen_scroll)
-        enemy.update()
+        enemy.ai(player, world.obstacle_tile, screen_scroll)
+        if enemy.alive:
+            enemy.update()
     player.update()
     
     teer = kaman.update(player)
     if teer:
         teer_group.add(teer)
     for teer in teer_group:
-        damage, damage_pos = teer.update(screen_scroll,enemy_list)
+        damage, damage_pos = teer.update(screen_scroll,world.obstacle_tile, enemy_list)
         if damage:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), cs.Red)
             damage_text_group.add(damage_text)

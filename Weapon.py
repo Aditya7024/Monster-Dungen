@@ -51,7 +51,7 @@ class Teer(pygame.sprite.Sprite):
         self.dy = -(math.sin(math.radians(self.angle)) * cs.Teer_speed)
 
 
-    def update(self,screen_scroll,enemy_list):
+    def update(self,screen_scroll, obstacle_tile, enemy_list):
         # reset variable
         damage = 0
         damage_pos = None
@@ -59,6 +59,11 @@ class Teer(pygame.sprite.Sprite):
         # reposition based on speed
         self.rect.x += screen_scroll[0] + self.dx
         self.rect.y += screen_scroll[1] + self.dy
+
+        # Check for collision b/w teer and tile walls
+        for obst in obstacle_tile:
+            if obst[1].colliderect(self.rect):
+                self.kill() 
 
         # check isf arrow gone out of the screen
         if self.rect.right < 0 or self.rect.left > cs.Screen_Width or self.rect.bottom < 0 or self.rect.top > cs.Screen_Hight:
@@ -70,6 +75,7 @@ class Teer(pygame.sprite.Sprite):
                 damage = 10 + random.randint(-5,5)
                 damage_pos = enemy.rect
                 enemy.health -= damage
+                enemy.hit = True
                 self.kill()
                 break
         

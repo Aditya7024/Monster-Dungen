@@ -3,8 +3,9 @@ import math
 import Constants as cs
 
 class Characters():
-    def __init__(self, x, y, health, mob_animation, char_type):
+    def __init__(self, x, y, health, mob_animation, char_type, boss, size):
         self.char_type = char_type
+        self.boss = boss
         self.score = 0
         self.flip = False
         self.animation_list = mob_animation[char_type]
@@ -14,12 +15,15 @@ class Characters():
         self.running = False
         self.health = health
         self.alive = True
+        self.hit = False
+        self.last_hit = pygame.time.get_ticks()
+        self.stunned = False
 
         self.image = self.animation_list[self.action][self.frame_index]
-        self.rect = pygame.Rect(0,0, cs.Tile_Size, cs.Tile_Size)
+        self.rect = pygame.Rect(0,0, cs.Tile_Size * size, cs.Tile_Size * size)
         self.rect.center = (x,y)
     
-    def move(self,dx,dy):
+    def move(self,dx,dy, obstacle_tile):
         screen_scroll = [0,0]
         self.running = False
         if dx != 0 or dy != 0:
@@ -31,8 +35,28 @@ class Characters():
         if dx != 0 and dy != 0:
             dx = dx * (math.sqrt(2)/2)
             dy = dy * (math.sqrt(2)/2)
+        
+        # Ckeck for collision with map in x direction
         self.rect.x += dx
+        for obst in obstacle_tile:
+            # Ckeck for collision
+            if obst[1].colliderect(self.rect):
+                # check the side of collision
+                if dx > 0:
+                    self.rect.right = obst[1].left
+                if dx < 0:
+                    self.rect.left = obst[1].right    
+        
+        # Ckeck for collision with map in x direction
         self.rect.y += dy
+        for obst in obstacle_tile:
+            # Ckeck for collision
+            if obst[1].colliderect(self.rect):
+                # check the side of collision
+                if dy > 0:
+                    self.rect.bottom = obst[1].top
+                if dy < 0:
+                    self.rect.top = obst[1].bottom
 
         # only move screen for player not enimies movements
         if self.char_type == 0:
@@ -55,16 +79,72 @@ class Characters():
 
         return screen_scroll
 
-    def ai(self, screen_scroll):
+    def ai(self, player, obstacle_tile, screen_scroll):
+        clipped_line = ()
+        stun_cooldown = 100
+        ai_dx = 0
+        ai_dy = 0
+        
         # reposition the mobs based on screen scroll
         self.rect.x += screen_scroll[0]
         self.rect.y += screen_scroll[1]
+        
+        # Create a line os sight from enemy to the player
+        line_of_sight = ((self.rect.centerx, self.rect.centery), (player.rect.centerx, player.rect.centery))
+        
+        # Check if line of sight passes through an obstacle tile
+        for obsta in obstacle_tile:
+            if obsta[1].clipline(line_of_sight):
+                clipped_line = obsta[1].clipline(line_of_sight)
+
+        # Check distance  to player
+        dist = math.sqrt(((self.rect.centerx - player.rect.centerx) ** 2) + ((self.rect.centery - player.rect.centery) ** 2))
+        if not clipped_line and dist > cs.Range:
+            if self.rect.centerx > player.rect.centerx:
+                ai_dx = -cs.Enemy_Speed
+        
+            if self.rect.centerx < player.rect.centerx:
+                ai_dx = cs.Enemy_Speed    
+
+            if self.rect.centery > player.rect.centery:
+                ai_dy = -cs.Enemy_Speed        
+        
+            if self.rect.centery < player.rect.centery:
+                ai_dy = cs.Enemy_Speed      
+        
+        if self.alive:
+            if not self.stunned:              
+                # Move towards the player
+                self.move(ai_dx, ai_dy, obstacle_tile)
+                # Attack Player
+                if dist < cs.Attack_Range and player.hit == False:
+                    player.health -= 10
+                    player.hit = True
+                    player.last_hit = pygame.time.get_ticks()
+
+            # Check if hit
+            if self.hit == True:
+                self.hit = False
+                self.last_hit = pygame.time.get_ticks()
+                self.stunned = True
+                self.running = False
+                self.update_action(0)
+
+            if (pygame.time.get_ticks() - self.last_hit > stun_cooldown):
+                self.stunned = False
 
     def update(self):
         # check if character is dead
         if self.health <= 0:
             self.health = 0
             self.alive = False
+
+        # timer to reset player taking a hit
+        hit_cooldown = 1000
+        if self.char_type == 0:
+            if self.hit == True:
+                if pygame.time.get_ticks() - self.last_hit > hit_cooldown:
+                    self.hit = False
         # check what action is being performed
         if self.running == True:
             self.update_action(1) # run
