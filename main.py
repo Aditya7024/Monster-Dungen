@@ -58,6 +58,7 @@ item_images.append(potion_image)
 # Load weapon image
 kaman_image = scale_img(pygame.image.load(r"assets\images\weapons\bow.png").convert_alpha(),cs.Weapon_Scale)
 teer_image = scale_img(pygame.image.load(r"assets\images\weapons\arrow.png").convert_alpha(),cs.Weapon_Scale)
+fireball_image = scale_img(pygame.image.load(r"assets\images\weapons\fireball.png").convert_alpha(),cs.Fireball_Scale)
 
 # Load tile map images
 tile_list = []
@@ -162,6 +163,7 @@ enemy_list = world.enemies
 damage_text_group = pygame.sprite.Group()
 teer_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
+fireball_group = pygame.sprite.Group()
 
 score_coin = Item(cs.Screen_Width-115, 23, 0, coin_images, True)
 item_group.add(score_coin)
@@ -195,7 +197,9 @@ while run:
     world.update(screen_scroll)
 
     for enemy in enemy_list:
-        enemy.ai(player, world.obstacle_tile, screen_scroll)
+        fireball = enemy.ai(player, world.obstacle_tile, screen_scroll, fireball_image)
+        if fireball:
+            fireball_group.add(fireball)
         if enemy.alive:
             enemy.update()
     player.update()
@@ -209,6 +213,7 @@ while run:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), cs.Red)
             damage_text_group.add(damage_text)
     damage_text_group.update()
+    fireball_group.update(screen_scroll, player)
     item_group.update(screen_scroll, player)
     
 
@@ -222,6 +227,9 @@ while run:
     for teer in teer_group:
         teer.draw(Screen)
     
+    for fireball in fireball_group:
+        fireball.draw(Screen)
+        
     damage_text_group.draw(Screen)
     item_group.draw(Screen)
     draw_info()
