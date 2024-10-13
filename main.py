@@ -19,7 +19,7 @@ pygame.display.set_caption(" Monster Killer !")
 clock = pygame.time.Clock()
 
 # Define game variables
-level = 3
+level = 1
 screen_scroll = [0,0]
 
 # Player Movement
@@ -29,7 +29,7 @@ moving_up = False
 moving_down = False
 
 # define Font
-font = pygame.font.Font(r"assets\fonts\AtariClassic.ttf",20)
+font = pygame.font.Font(r"assets/fonts/AtariClassic.ttf",20)
 
 
 def scale_img(image,scale):
@@ -45,7 +45,7 @@ heart_half = scale_img(pygame.image.load(r"assets\images\items\heart_half.png").
 # load coin images
 coin_images = []
 for i in range(4):
-    img = scale_img(pygame.image.load(f"assets\images\items\coin_f{i}.png").convert_alpha(),cs.Item_Scale)
+    img = scale_img(pygame.image.load(f"assets/images/items/coin_f{i}.png").convert_alpha(),cs.Item_Scale)
     coin_images.append(img)
 
 # Load potion image
@@ -78,7 +78,7 @@ for mob in mob_types:
     for animation in animation_types:
         temp_list = []
         for i in range(4):
-            images = pygame.image.load(f"assets\images\characters\{mob}\{animation}\{i}.png").convert_alpha()
+            images = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
             images = scale_img(images,cs.Scale)
             temp_list.append(images)
         animation_list.append(temp_list)
@@ -110,6 +110,22 @@ def draw_info ():
 
     # show Score
     draw_text(f"X{player.score}", font, cs.White, cs.Screen_Width - 100, 15)
+
+# Function to reset level
+def reset_level():
+    damage_text_group.empty()
+    teer_group.empty()
+    item_group.empty()
+    fireball_group.empty()
+
+    # Creat empty tile list
+    data = []
+    for row in range(cs.Rows):
+        r = [-1] * cs.Columns
+        data.append(r)
+    
+    return data
+
 
 # create empty tile list
 world_data = [  ]
@@ -191,7 +207,7 @@ while run:
         dy = cs.Speed
 
     # Move of player at dx,dy  
-    screen_scroll = player.move(dx,dy, world.obstacle_tile)
+    screen_scroll, level_complete = player.move(dx, dy, world.obstacle_tile, world.exit_tile)
 
     # Update all objects 
     world.update(screen_scroll)
@@ -234,6 +250,31 @@ while run:
     item_group.draw(Screen)
     draw_info()
     score_coin.draw(Screen)
+
+    # Check level completer
+    if level_complete == True:
+        level += 1
+        world_data = reset_level()
+        # Loading level data to create world
+        with open(f"Levels/level{level}_data.csv",newline = "") as csvfile:
+            reader = csv.reader(csvfile, delimiter= ",")
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    world_data[x][y] = int(tile)
+
+        world = Worlds()
+        world.process_data(world_data, tile_list, item_images, mob_animations)
+
+        temp_hp = player.health
+        temp_score = player.score
+        player = world.player
+        player.health = temp_hp
+        player.score = temp_score
+        enemy_list = world.enemies
+        score_coin = Item(cs.Screen_Width - 155, 23, 0, coin_images, True)
+        item_group.add(score_coin)
+        for item in world.item_list:
+            item_group.add(item)
 
     # Event Handler
     for event in pygame.event.get():
