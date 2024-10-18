@@ -23,6 +23,7 @@ Attack_Range = 75
 
 # Colors
 Red = (255,0,0)
+Menu_BG = (130, 0, 0)
 Back_Ground = (40,25,25)
 Panel = (50, 50, 50)
 White = (255, 255, 255)
