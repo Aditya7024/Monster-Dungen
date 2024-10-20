@@ -1,3 +1,15 @@
+# Requirments:
+Pygame: The main library used for handling graphics, sound, and game logic.
+Install via pip: pip install pygame
+Python 3.x: Ensure you are using a compatible Python version (e.g., Python 3.8 or higher).
+Required assets: Make sure the following directories and files are included in your project:
+
+assets/images/ (for buttons, characters, items, weapons, tiles)
+assets/audio/ (for music and sound effects)
+Levels/ (for CSV files representing different game levels)
+Constants.py (for any constants used in the game, like screen dimensions and scale values)
+Character.py, Weapon.py, Items.py, World.py, Button.py (for the various game components you've created)
+
 # Monster Killer
 
 **Monster Killer** is an adventure game where players battle monsters across multiple levels, collect coins and potions, and face off against an AI-generated Boss. The Boss fights back by shooting at the player, adding a thrilling challenge!
@@ -13,16 +25,19 @@
   ![image](https://github.com/user-attachments/assets/895fdc83-e66a-4701-b482-de569ef12bbc)
 
 - **Monsters**: Players face various monsters and enemies that now move and attack the player thanks to AI features.
+ 
  ![image](https://github.com/user-attachments/assets/935e09ab-fd9f-441d-af8e-5114f9144de2)
 
 - **Coins & Potions**: Collect goodies like coins and potions to help boost your progress.
  
 - **AI Boss Fight**: The Boss is an AI-generated enemy that shoots at the player, adding a strategic challenge to the gameplay.
+
  ![image](https://github.com/user-attachments/assets/df788881-9ecd-4a71-8df4-461ffb26517a)
 
 - **Sound Effects**: Includes immersive sound effects from start to finish, enhancing gameplay as you collect items and defeat enemies.
  
 - **Game Over Screen**: If the player dies, all coins are lost, and the game restarts from the beginning of the level.
+  
  ![image](https://github.com/user-attachments/assets/b456be3e-3c19-4d2a-a511-fd1fb1035b19)
 
 ## Latest Updates:
