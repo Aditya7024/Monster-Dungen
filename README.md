@@ -2,13 +2,6 @@
 - Pygame: 
 - Install via pip: pip install pygame
 - Python 3.x: Ensure you are using a compatible Python version (e.g., Python 3.8 or higher).
-- Required assets: Make sure the following directories and files are included in your project:
-
-assets/images/ (for buttons, characters, items, weapons, tiles)
-assets/audio/ (for music and sound effects)
-Levels/ (for CSV files representing different game levels)
-Constants.py (for any constants used in the game, like screen dimensions and scale values)
-Character.py, Weapon.py, Items.py, World.py, Button.py (for the various game components you've created)
 
 # Monster Killer
 
