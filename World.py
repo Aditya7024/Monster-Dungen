@@ -42,7 +42,7 @@ class Worlds():
                     tile_data[0] = tile_list[0]
 
                 elif tile == 11:
-                    player = Characters(image_x, image_y, 20, mob_animations,0, False, 1)
+                    player = Characters(image_x, image_y, 100, mob_animations,0, False, 1)
                     self.player = player
                     tile_data[0] = tile_list[0]
 

@@ -1,5 +1,6 @@
 from typing import Any
 import pygame
+from pygame import mixer
 import csv
 import pygame.locals
 from pygame.sprite import Group 
@@ -10,7 +11,8 @@ from Items import Item
 from World import Worlds
 from Button import Buttons
 
-pygame.init
+mixer.init()
+pygame.init()
 pygame.font.init()
 
 Screen = pygame.display.set_mode((cs.Screen_Width,cs.Screen_Hight))
@@ -40,6 +42,19 @@ def scale_img(image,scale):
     w = image.get_width()
     h = image.get_height()
     return pygame.transform.scale(image,(w * scale, h* scale))
+
+# Load music and sounds
+pygame.mixer.music.load("assets/audio/music.wav")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1, 0.0, 5000)
+shot_teer = pygame.mixer.Sound("assets/audio/arrow_shot.mp3")
+shot_teer.set_volume(0.5)
+teer_hit = pygame.mixer.Sound("assets/audio/arrow_hit.wav")
+teer_hit.set_volume(0.5)
+coin_sou = pygame.mixer.Sound("assets/audio/coin.wav")
+coin_sou.set_volume(0.5)
+portion_sou = pygame.mixer.Sound("assets/audio/heal.wav")
+portion_sou.set_volume(0.5)
 
 # Load button images
 restart_img = scale_img(pygame.image.load(r"assets\images\buttons\button_restart.png").convert_alpha(),cs.Button_Scale)
@@ -287,14 +302,16 @@ while run:
                 teer = kaman.update(player)
                 if teer:
                     teer_group.add(teer)
+                    shot_teer.play()
                 for teer in teer_group:
                     damage, damage_pos = teer.update(screen_scroll,world.obstacle_tile, enemy_list)
                     if damage:
                         damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), cs.Red)
                         damage_text_group.add(damage_text)
+                        teer_hit.play()
                 damage_text_group.update()
                 fireball_group.update(screen_scroll, player)
-                item_group.update(screen_scroll, player)
+                item_group.update(screen_scroll, player, coin_sou, portion_sou)
             
 
             # Draw the player on screen

@@ -13,7 +13,7 @@ class Item(pygame.sprite.Sprite):
         self.rect.center = (x,y)
         self.dummy_coin = dummy_coin
 
-    def update(self, screen_scroll, player):
+    def update(self, screen_scroll, player, coin_sou, portion_sou):
         # Doesn't apply to the dummy coin that is displayed at the top
         if not self.dummy_coin:
             # reposition based on screen scroll
@@ -24,8 +24,10 @@ class Item(pygame.sprite.Sprite):
             # coins
             if self.item_type == 0:
                 player.score += 1
+                coin_sou.play()
             elif self.item_type == 1:
                 player.health += 10
+                portion_sou.play()
                 if player.health > 100:
                     player.health = 100
             self.kill()
