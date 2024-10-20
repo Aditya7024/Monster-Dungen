@@ -1,8 +1,8 @@
 # Requirments:
-Pygame: The main library used for handling graphics, sound, and game logic.
-Install via pip: pip install pygame
-Python 3.x: Ensure you are using a compatible Python version (e.g., Python 3.8 or higher).
-Required assets: Make sure the following directories and files are included in your project:
+- Pygame: 
+- Install via pip: pip install pygame
+- Python 3.x: Ensure you are using a compatible Python version (e.g., Python 3.8 or higher).
+- Required assets: Make sure the following directories and files are included in your project:
 
 assets/images/ (for buttons, characters, items, weapons, tiles)
 assets/audio/ (for music and sound effects)
