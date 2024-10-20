@@ -5,25 +5,25 @@
 ## Features:
 
 - **Levels**: The game currently has 3 exciting levels with increasing difficulty.
-- 
-- ![image](https://github.com/user-attachments/assets/96f10a12-1732-41c4-b7f4-d41f02d25e18)
-- 
+ 
+  ![image](https://github.com/user-attachments/assets/96f10a12-1732-41c4-b7f4-d41f02d25e18)
+ 
   ![image](https://github.com/user-attachments/assets/fc34c146-da8c-4886-b321-cae644db2c8a)
   
   ![image](https://github.com/user-attachments/assets/895fdc83-e66a-4701-b482-de569ef12bbc)
 
 - **Monsters**: Players face various monsters and enemies that now move and attack the player thanks to AI features.
-- ![image](https://github.com/user-attachments/assets/935e09ab-fd9f-441d-af8e-5114f9144de2)
+ ![image](https://github.com/user-attachments/assets/935e09ab-fd9f-441d-af8e-5114f9144de2)
 
 - **Coins & Potions**: Collect goodies like coins and potions to help boost your progress.
-- 
+ 
 - **AI Boss Fight**: The Boss is an AI-generated enemy that shoots at the player, adding a strategic challenge to the gameplay.
-- ![image](https://github.com/user-attachments/assets/df788881-9ecd-4a71-8df4-461ffb26517a)
+ ![image](https://github.com/user-attachments/assets/df788881-9ecd-4a71-8df4-461ffb26517a)
 
 - **Sound Effects**: Includes immersive sound effects from start to finish, enhancing gameplay as you collect items and defeat enemies.
-- 
+ 
 - **Game Over Screen**: If the player dies, all coins are lost, and the game restarts from the beginning of the level.
-- ![image](https://github.com/user-attachments/assets/b456be3e-3c19-4d2a-a511-fd1fb1035b19)
+ ![image](https://github.com/user-attachments/assets/b456be3e-3c19-4d2a-a511-fd1fb1035b19)
 
 ## Latest Updates:
 
