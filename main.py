@@ -22,7 +22,7 @@ pygame.display.set_caption(" Monster Killer !")
 clock = pygame.time.Clock()
 
 # Define game variables
-level = 1
+level = 3
 start_game = False
 pause_game = False
 start_intro = False
